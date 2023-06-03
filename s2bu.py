@@ -17,15 +17,6 @@ from random import random
 from pygame.locals import *
 from PIL import Image, ImageDraw
 
-# Window coords
-#  x is left to right
-#  y is top to bottom
-
-# World coords
-#   Unit squares (between integer points)
-#   x is left to right
-#   y is top to bottom
-
 
 white = (255, 255, 255)
 black = (0, 0, 0)
@@ -39,9 +30,6 @@ num_colors = len(COLORS)
 resolution = (1000, 1000)
 pygame.init()
 screen = pygame.display.set_mode(resolution, pygame.RESIZABLE)
-# screen.set_caption("Example resizable window")
-# JayBird X4 = J'vla Bird X4 : blä X4
-# X3 = OK.
 
 
 def nbhs(i, j):
@@ -77,10 +65,13 @@ def gol(color):
   return result
 
 
-# Draws the slice between (x1,y1) and (x2,y2) in game coords to
-# the full screen.
-# The real world is made of unit squares which have their own colors.
 class Game():
+  """
+Draws the slice between (x1,y1) and (x2,y2) in game coords to
+the full screen.
+The real world is made of unit squares which have their own colors.
+  """
+
   def __init__(self):
     pygame.init()
     pygame.mixer.quit()
@@ -101,16 +92,18 @@ class Game():
     self.y1 = 0.0
     self.y2 = 50.0
 
-  # map x1 to 0, x2 to resolution[0]
-  # map y1 to 0, y2 to resolution[1].
-
   def to_screen(self, x, y):
+    """\
+    map x1 to 0, x2 to resolution[0]
+    map y1 to 0, y2 to resolution[1]"""
     return (int((x - self.x1) / (self.x2 - self.x1) * float(resolution[0])),
             int((y - self.y1) / (self.y2 - self.y1) * float(resolution[1])))
 
-  # map 0 to x1, resolution[0] to x2
-  # map 0 to y1, resolution[1] to y2
   def from_screen(self, x, y):
+    """\
+    map 0 to x1, resolution[0] to x2
+    map 0 to y1, resolution[1] to y2
+    """
     return (self.x1 + (self.x2 - self.x1) * x / float(resolution[0]),
             self.y1 + (self.y2 - self.y1) * y / float(resolution[1]))
 
@@ -130,12 +123,8 @@ class Game():
       k1, l1 = self.selection1
       k2, l2 = self.selection2
       if k1 <= k <= k2 and l1 <= l <= l2:
-        r, g, b = color
-        r //= 2
-        g //= 2
-        b //= 2
-        color = (r, g, b)
-    rects.append((color, (sx+1, sy+1, sxp - sx-1, syp - sy-1)))
+        color = (color[0] // 2, color[1] // 2, color[2] // 2)
+    rects.append((color, (sx + 1, sy + 1, sxp - sx - 1, syp - sy - 1)))
     lines.append((black, ((sx, sy), (sx, syp))))
     lines.append((black, ((sx, sy), (sxp, sy))))
     return rects, lines
@@ -146,7 +135,6 @@ class Game():
       pygame.draw.line(self.screen, l[0], *l[1])
     for r in rects:
       pygame.draw.rect(self.screen, r[0], pygame.Rect(r[1]))
-
 
   def get_all_draw_steps(self):
     rects = []
@@ -247,7 +235,6 @@ class Game():
               ng[x] = 1
             self.color = ng
             self.draw_all()
-
       elif event.type == pygame.MOUSEBUTTONUP:
         x, y = self.from_screen(*event.pos)
         if event.button == 1:
@@ -269,7 +256,6 @@ class Game():
             self.x2 = tx + zoom_factor * (self.x2 - tx)
             self.y2 = ty + zoom_factor * (self.y2 - ty)
             self.draw_all()
-#      elif event.type == pygame.MOUSEMOTION:
       elif event.type == pygame.VIDEORESIZE:
         print(event)
         # surface = pygame.display.set_mode((event.w, event.h),pygame.RESIZABLE)
